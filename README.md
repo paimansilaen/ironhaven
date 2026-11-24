@@ -4,67 +4,58 @@
 [![rank](https://make.fun/badge/gta6-01/paimansilaen/ironhaven/rank.svg)](https://make.fun/bounty/gta6-01)
 [![reward](https://make.fun/badge/gta6-01/paimansilaen/ironhaven/reward.svg)](https://make.fun/bounty/gta6-01)
 
-**Ironhaven** is an open-world crime game set in a rain-slicked industrial port city at dusk — container yards, harbor cranes, warehouses, a rust-belt downtown and a bridge over the harbor. An original game in the spirit of GTA 6, built with three.js. No Rockstar name, logo, character, map or asset anywhere: every street, name and face is original.
+An open-world crime game in a rain-slicked industrial port city at dusk. Mara Voss,
+32, ex-getaway driver, runs courier jobs for her late father's garage, Voss Auto —
+which owes $50,000 to fixer Dell Kaine of the Harbor Crew. Eight jobs pay the debt
+down, ending in one last vault heist against Meridian Development Corp.
 
-## Story
+## What is in the game
 
-Mara Voss, 32, ex-getaway driver, now runs courier jobs for her late father's garage, **Voss Auto**. The garage owes **$50,000** to fixer Dell Kaine of the Harbor Crew. Eight jobs pay the debt down — and the debt leads to one last vault heist against Meridian Development Corp.
-
-## Missions (8)
-
-1. **First Run** — courier delivery under time, learn the drive.
-2. **Night Shift** — taxi-style pickup across town.
-3. **Marked** — steal a marked car and bring it to Voss Auto.
-4. **The Tail** — follow a Harbor Crew truck without being spotted.
-5. **Loud** — getaway chase after a job goes loud.
-6. **Warehouse** — on-foot ambush: pistol and fists against four crew.
-7. **Heat** — escape a 3-star wanted level to the safehouse.
-8. **The Vault** — finale: crack the Meridian vault, five stars, escape to the docks.
-
-## Systems
-
-- Third-person on foot (WASD + mouse orbit camera, sprint) and arcade driving (acceleration, braking, steering, handbrake) in sedans, taxis, trucks, vans, sports cars and police cars.
-- Traffic cars and pedestrians with simple AI — they follow the roads, avoid collisions and flee when scared.
-- Car stealing, parked or occupied (the driver flees, wanted level rises).
-- Wanted system, 1–5 stars: police patrol cars chase and ram, on-foot cops chase and punch; wanted decays when you break line of sight. BUSTED and WASTED flows with bail and hospital costs.
-- On-foot combat: punch and pistol with ammo, health and ammo pickups.
-- HUD: health, cash, debt to Dell Kaine, wanted stars, mission objective with timer and distance, speed; a 2D canvas minimap with player, police, traffic and mission blips.
-- Start menu, pause, save/load via localStorage (cash, debt, mission progress), mission passed/failed screens.
-- Sound: 100% WebAudio-synthesised — engine hum, police sirens, gunshots, pickups, mission stings. No audio files, no network.
-- Polish: dusk lighting and fog, a low sun over the harbor, rain particles, wet-road puddles.
+- **A city to explore**: container yards and cranes, warehouses, a rust-belt
+  downtown of towers, a harbor bridge, docks, wet roads, fog, rain, and a low
+  orange sun under a purple dusk sky.
+- **On foot and by car**: third-person walking with an orbit camera, sprinting,
+  and arcade driving (sedan, taxi, truck, van, sport, police) with handbrake
+  drifts, headlights, and traffic that follows the road grid.
+- **A living street**: traffic cars that slow for the car ahead, pedestrians who
+  wander the sidewalks and flee gunshots and speeding cars.
+- **Wanted, 0–5 stars**: stealing a car, hitting a pedestrian, or ramming a
+  police car raises the heat. Patrol cars chase and ram; on-foot cops chase and
+  punch. Lose sight of them and the heat cools off. Get caught slow on foot and
+  you are BUSTED; hit zero health and you are WASTED.
+- **Combat**: fists and a pistol (raycast along the camera), ammo and reload,
+  health and ammo pickups scattered around the city.
+- **Eight missions with a story**: courier runs, a taxi fare, a stolen sport car,
+  a tail job, two police escapes, a warehouse ambush, and the Meridian vault
+  heist — $50,000 of debt paydown in total, tracked on the HUD.
+- **HUD and minimap**: health, ammo, cash, remaining debt, wanted stars,
+  objective and timer, speed, and a live top-down minimap with the mission
+  blip, police, and traffic.
+- **Menus and saves**: title screen, pause, BUSTED/WASTED retries, a
+  story-complete screen, and localStorage saves with a Continue button.
+- **Sound, synthesised**: engine hum pitched by speed, two-tone sirens,
+  gunshots, pickup blips, and mission stings — all WebAudio, no audio files.
 
 ## Controls
 
 | Key | Action |
 | --- | --- |
-| WASD / arrows | Walk / drive |
+| W A S D / arrows | Move on foot, drive |
 | Mouse drag | Orbit camera |
 | Mouse wheel | Zoom camera |
-| E | Enter / exit car (steal: walk up and press E) |
 | Shift | Sprint |
-| Q | Draw / holster pistol |
-| Click | Shoot (pistol out) |
+| Space | Handbrake drift |
+| E | Enter / exit car, grab the vault cash |
 | F | Punch |
-| Space | Handbrake |
-| P / Esc | Pause |
-| M | Mute sound |
+| Mouse click | Fire pistol |
+| R | Reload |
+| Esc | Pause |
 
 ## Play
 
-Serve the `game/` folder with any static server and open it in a desktop browser — the game runs fully offline from its own files:
+Serve `game/` with any static server (for example `node serve.ts`, then open
+`http://localhost:8080`) and press Start. Everything the game loads lives under
+`game/`; it makes no network requests. three.js is vendored under
+`game/vendor/three.min.js`.
 
-```sh
-node serve.ts
-# open http://localhost:8080
-```
-
-Screenshots are staged deterministically: `?shot=start|drive|chase|heist&seed=1` plays the real game forward from a seeded world and marks `window.__shotReady` when painted. `?selftest=1` runs the 14 automated play-tests and writes the results to `#test-results`.
-
-## Tech
-
-- [three.js](https://threejs.org/) r160, vendored as `game/vendor/three.min.js` (UMD build, loaded with a classic script tag).
-- No build step, no dependencies, no network requests at runtime.
-
-## License
-
-MIT — see [LICENSE](LICENSE).
+MIT licensed. All names, characters, and places are original.

@@ -1,1 +1,1 @@
-[{"name":"1-start.jpg","query":"?shot=start&seed=1"},{"name":"2-drive.jpg","query":"?shot=drive&seed=1"},{"name":"3-chase.jpg","query":"?shot=chase&seed=1"},{"name":"4-heist.jpg","query":"?shot=heist&seed=1"}]
+{"shots":[{"file":"1-start.jpg","url":"game/index.html?shot=start&seed=1"},{"file":"2-drive.jpg","url":"game/index.html?shot=drive&seed=1"},{"file":"3-chase.jpg","url":"game/index.html?shot=chase&seed=1"},{"file":"4-heist.jpg","url":"game/index.html?shot=heist&seed=1"}]}
