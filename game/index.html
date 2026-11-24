@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ironhaven — an open-world crime game</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #14161f; font-family: "Segoe UI", Arial, sans-serif; color: #e8e6df; }
+  #game { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  #hud { position: fixed; inset: 0; pointer-events: none; display: none; }
+  #hud.on { display: block; }
+  .panel { background: rgba(10, 12, 20, 0.62); border: 1px solid rgba(255,255,255,0.14); border-radius: 8px; padding: 8px 12px; }
+  #stats { position: absolute; top: 12px; left: 12px; min-width: 230px; }
+  #stats .row { display: flex; justify-content: space-between; gap: 14px; font-size: 15px; line-height: 1.5; }
+  #stats .label { color: #b9b4a6; }
+  #healthbar { height: 10px; background: #3a2020; border-radius: 5px; overflow: hidden; margin-top: 4px; }
+  #healthfill { height: 100%; width: 100%; background: linear-gradient(90deg, #e5484d, #f5a524); }
+  #wanted { position: absolute; top: 12px; right: 12px; font-size: 26px; letter-spacing: 4px; color: #ffd75e; text-shadow: 0 0 8px rgba(0,0,0,0.8); }
+  #wanted .off { color: rgba(255,255,255,0.22); }
+  #objective { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); text-align: center; max-width: 520px; }
+  #objective .title { font-size: 17px; font-weight: 700; color: #ffd75e; }
+  #objective .text { font-size: 14px; color: #e8e6df; }
+  #objective .timer { font-size: 15px; font-weight: 700; color: #7dd3fc; }
+  #speed { position: absolute; right: 14px; bottom: 14px; font-size: 30px; font-weight: 800; text-shadow: 0 2px 6px #000; }
+  #speed small { font-size: 13px; font-weight: 400; color: #b9b4a6; }
+  #minimap { position: absolute; left: 12px; bottom: 12px; border: 2px solid rgba(255,255,255,0.25); border-radius: 50%; background: #0c0f16; }
+  #msg { position: absolute; left: 50%; top: 34%; transform: translateX(-50%); text-align: center; font-size: 30px; font-weight: 800; letter-spacing: 1px; text-shadow: 0 2px 10px #000; display: none; }
+  #msg small { display: block; font-size: 16px; font-weight: 400; color: #ffd75e; margin-top: 6px; }
+  #hint { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); font-size: 13px; color: #cfcabb; background: rgba(10,12,20,0.55); padding: 5px 12px; border-radius: 6px; }
+  #crosshair { position: absolute; left: 50%; top: 50%; width: 18px; height: 18px; margin: -9px 0 0 -9px; display: none; }
+  #crosshair:before, #crosshair:after { content: ""; position: absolute; background: #fff; }
+  #crosshair:before { left: 8px; top: 0; width: 2px; height: 18px; }
+  #crosshair:after { top: 8px; left: 0; width: 18px; height: 2px; }
+  .overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(180deg, rgba(8,10,18,0.55), rgba(8,10,18,0.88)); z-index: 10; }
+  .card { max-width: 620px; padding: 34px 40px; text-align: center; background: rgba(12,14,24,0.85); border: 1px solid rgba(255,215,94,0.35); border-radius: 14px; }
+  .card h1 { margin: 0 0 4px; font-size: 54px; letter-spacing: 6px; color: #ffd75e; }
+  .card h2 { margin: 0 0 14px; font-size: 15px; font-weight: 400; color: #9fb4c7; letter-spacing: 3px; text-transform: uppercase; }
+  .card p { font-size: 15px; line-height: 1.6; color: #d8d3c4; text-align: left; }
+  .card .controls { font-size: 13px; line-height: 1.9; color: #b9b4a6; text-align: left; column-count: 2; }
+  .card button { pointer-events: auto; margin: 8px 6px 0; padding: 12px 26px; font-size: 16px; font-weight: 700; color: #14161f; background: #ffd75e; border: 0; border-radius: 8px; cursor: pointer; }
+  .card button.secondary { background: transparent; color: #ffd75e; border: 1px solid #ffd75e; }
+  .card button:hover { filter: brightness(1.1); }
+  #title-screen, #pause-screen, #end-screen { display: none; }
+  #title-screen.on, #pause-screen.on, #end-screen.on { display: flex; }
+  #end-screen h1 { font-size: 44px; }
+  #test-results { position: fixed; left: 0; bottom: 0; z-index: 99; font-size: 10px; color: #888; white-space: pre; }
+</style>
+</head>
+<body>
+<canvas id="game" aria-label="Ironhaven: open-world crime game in a rain-slicked industrial port city"></canvas>
+
+<div id="hud">
+  <div id="stats" class="panel">
+    <div class="row"><span class="label">MARA VOSS</span><span id="cash">$350</span></div>
+    <div class="row"><span class="label">Debt to Dell Kaine</span><span id="debt">$50,000</span></div>
+    <div class="row"><span class="label">Ammo</span><span id="ammo">—</span></div>
+    <div id="healthbar"><div id="healthfill"></div></div>
+  </div>
+  <div id="wanted"><span class="off">★★★★★</span></div>
+  <div id="objective" class="panel"><div class="title" id="obj-title">IRONHAVEN</div><div class="text" id="obj-text"></div><div class="timer" id="obj-timer"></div></div>
+  <canvas id="minimap" width="190" height="190"></canvas>
+  <div id="speed">0 <small>mph</small></div>
+  <div id="msg"></div>
+  <div id="hint">WASD move/drive &nbsp;·&nbsp; E enter car &nbsp;·&nbsp; Q pistol &nbsp;·&nbsp; Click shoot &nbsp;·&nbsp; F punch &nbsp;·&nbsp; Shift sprint &nbsp;·&nbsp; Space handbrake &nbsp;·&nbsp; P pause</div>
+  <div id="crosshair"></div>
+</div>
+
+<div id="title-screen" class="overlay on">
+  <div class="card">
+    <h1>IRONHAVEN</h1>
+    <h2>A rain-slicked port city &middot; an open-world crime story</h2>
+    <p>Mara Voss, 32, ex-getaway driver. Her late father's garage, <b>Voss Auto</b>, owes <b>$50,000</b> to fixer Dell Kaine of the Harbor Crew. Eight courier jobs pay it down — and the debt leads to one last vault heist against Meridian Development Corp. Drive, steal, tail, fight, outrun the Ironhaven PD, and get out clean.</p>
+    <div class="controls">
+      <div>WASD — walk / drive</div><div>Mouse drag — camera</div>
+      <div>E — enter / exit car</div><div>Shift — sprint</div>
+      <div>Q — draw pistol</div><div>Click — shoot</div>
+      <div>F — punch</div><div>Space — handbrake</div>
+      <div>P / Esc — pause</div><div>M — mute sound</div>
+    </div>
+    <br>
+    <button id="btn-start">START ENGINE</button>
+    <button id="btn-continue" class="secondary" style="display:none">CONTINUE</button>
+  </div>
+</div>
+
+<div id="pause-screen" class="overlay">
+  <div class="card">
+    <h1 style="font-size:36px">PAUSED</h1>
+    <p style="text-align:center">Ironhaven waits. The rain doesn't.</p>
+    <button id="btn-resume">RESUME</button>
+    <button id="btn-save" class="secondary">SAVE GAME</button>
+    <button id="btn-quit" class="secondary">QUIT TO TITLE</button>
+  </div>
+</div>
+
+<div id="end-screen" class="overlay">
+  <div class="card">
+    <h1 id="end-title">WASTED</h1>
+    <p id="end-text" style="text-align:center"></p>
+    <button id="btn-end">CONTINUE</button>
+  </div>
+</div>
+
+<div id="test-results"></div>
+
+<script>window.__errors = []; window.addEventListener('error', function (e) { window.__errors.push(String(e.message || e.error)); });</script>
+<script src="./vendor/three.min.js"></script>
+<script src="./src/util.js"></script>
+<script src="./src/audio.js"></script>
+<script src="./src/city.js"></script>
+<script src="./src/game.js"></script>
+</body>
+</html>
